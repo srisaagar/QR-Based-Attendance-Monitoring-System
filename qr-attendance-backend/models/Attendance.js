@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
 const attendanceSchema = new mongoose.Schema({
   className: String,
@@ -13,6 +14,10 @@ const attendanceSchema = new mongoose.Schema({
   qrCodeGeneratedAt: {
     type: Date,
     default: Date.now
+  },
+  qrCodeToken: {
+    type: String,
+    default: uuidv4
   },
   students: [
     {

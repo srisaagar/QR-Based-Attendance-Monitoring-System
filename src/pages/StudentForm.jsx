@@ -4,51 +4,65 @@ import './StudentForm.css';
 
 const StudentForm = () => {
   const [form, setForm] = useState({ name: '', rollNo: '' });
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // The backend will now validate the timestamp of the QR code
       await axios.post(`http://${window.location.hostname}:5000/api/attendance/student/mark-attendance`, {
-        qrData: window.location.href, // Send the full URL scanned from QR
+        qrData: window.location.href,
         name: form.name,
         rollNo: form.rollNo,
-        deviceId: navigator.userAgent, // A simple way to get a unique device ID
+        deviceId: navigator.userAgent,
       });
 
       alert('Attendance marked successfully!');
-      // Optionally, disable the form after successful submission
-      e.target.style.display = 'none';
+      setSubmitted(true);
     } catch (err) {
       console.error(err.response?.data || err.message);
-      // Display the specific error from the backend (e.g., "QR Code has expired")
       alert('Error: ' + (err.response?.data?.message || 'Server error'));
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="student-form-container">
-      <h2>Fill Your Details</h2>
-      <input
-        type="text"
-        placeholder="Name"
-        value={form.name}
-        onChange={(e) => setForm({ ...form, name: e.target.value })}
-        className="student-form-input"
-        required
+    <div className="student-form-page">
+      <img
+        src="https://d2e9h3gjmozu47.cloudfront.net/brand.png"
+        alt="College Logo"
+        className="student-logo"
       />
-      <input
-        type="text"
-        placeholder="Roll No"
-        value={form.rollNo}
-        onChange={(e) => setForm({ ...form, rollNo: e.target.value })}
-        className="student-form-input"
-        required
-      />
-      <button type="submit" className="student-form-button">
-        Submit Attendance
-      </button>
-    </form>
+
+      {!submitted ? (
+        <form onSubmit={handleSubmit} className="student-form-card">
+          <h2 className="student-form-title">📝 Mark Your Attendance</h2>
+          <p className="student-form-subtitle">Please enter your name and roll number</p>
+
+          <input
+            type="text"
+            placeholder="👤 Name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className="student-form-input"
+            required
+          />
+          <input
+            type="text"
+            placeholder="🎓 Roll No"
+            value={form.rollNo}
+            onChange={(e) => setForm({ ...form, rollNo: e.target.value })}
+            className="student-form-input"
+            required
+          />
+          <button type="submit" className="student-form-button">Submit Attendance</button>
+          <p className="student-form-footer">© 2025 College QR Attendance System</p>
+        </form>
+      ) : (
+        <div className="thank-you-card">
+          <h2>✅ Attendance Marked</h2>
+          <p>Thank you! You may now close this tab.</p>
+        </div>
+      )}
+    </div>
   );
 };
 

@@ -18,14 +18,19 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET || 'secretkey', { expiresIn: '1d' });
     res.json({ token });
   } catch (err) {
-  console.error('❌ Admin login error:', err);
-  res.status(500).json({ message: 'Server error' });
-}
+    console.error('❌ Admin login error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
-// Add Teacher
+// Add Teacher with @msrit.edu email check
 router.post('/add-teacher', async (req, res) => {
   const { name, email, password } = req.body;
+
+  if (!email.endsWith('@msrit.edu')) {
+    return res.status(400).json({ message: 'Only @msrit.edu email addresses are allowed' });
+  }
+
   try {
     const existing = await Teacher.findOne({ email });
     if (existing) return res.status(400).json({ message: 'Email already in use' });
